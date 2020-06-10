@@ -180,3 +180,39 @@ variable "cdn" {
   type        = bool
   default     = false
 }
+
+variable "internal_subnetwork" {
+  description = "Name of the subnetwork to create internal load balancers in."
+  type        = string
+  default     = "default"
+}
+
+variable "internal_network" {
+  description = "Name of the network to create internal load balancers in."
+  type        = string
+  default     = "default"
+}
+
+variable "internal_ssl" {
+  description = "Set to `true` to enable internal https load balancer."
+  type        = bool
+  default     = false
+}
+
+variable "http_internal_forward" {
+  description = "Set to `true` to enable internal http load balancer."
+  type        = bool
+  default     = false
+}
+
+variable "external_ssl" {
+  description = "Set to `true` to enable external https load balancer."
+  type        = bool
+  default     = false
+}
+
+variable "http_external_forward" {
+  description = "Set to `true` to enable external http load balancer."
+  type        = bool
+  default     = false
+}

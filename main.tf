@@ -20,9 +20,37 @@ locals {
   url_map = var.create_url_map ? join("", google_compute_url_map.default.*.self_link) : var.url_map
 }
 
+resource "google_compute_forwarding_rule" "http" {
+  provider              = google-beta
+  project               = var.project
+  count                 = var.http_internal_forward ? 1 : 0
+  name                  = "${var.name}-internal-http"
+  target                = google_compute_target_http_proxy.default[0].self_link
+  ip_protocol           = "TCP"
+  load_balancing_scheme = "INTERNAL_MANAGED"
+  port_range            = "80"
+  network               = var.internal_network
+  subnetwork            = var.internal_subnetwork
+  network_tier          = "PREMIUM"
+}
+
+resource "google_compute_forwarding_rule" "https" {
+  provider              = google-beta
+  project               = var.project
+  count                 = var.internal_ssl ? 1 : 0
+  name                  = "${var.name}-internal-https"
+  target                = google_compute_target_https_proxy.default[0].self_link
+  ip_protocol           = "TCP"
+  load_balancing_scheme = "INTERNAL_MANAGED"
+  port_range            = "443"
+  network               = var.internal_network
+  subnetwork            = var.internal_subnetwork
+  network_tier          = "PREMIUM"
+}
+
 resource "google_compute_global_forwarding_rule" "http" {
   project    = var.project
-  count      = var.http_forward ? 1 : 0
+  count      = var.http_external_forward ? 1 : 0
   name       = var.name
   target     = google_compute_target_http_proxy.default[0].self_link
   ip_address = local.address
@@ -31,7 +59,7 @@ resource "google_compute_global_forwarding_rule" "http" {
 
 resource "google_compute_global_forwarding_rule" "https" {
   project    = var.project
-  count      = var.ssl ? 1 : 0
+  count      = var.external_ssl ? 1 : 0
   name       = "${var.name}-https"
   target     = google_compute_target_https_proxy.default[0].self_link
   ip_address = local.address
